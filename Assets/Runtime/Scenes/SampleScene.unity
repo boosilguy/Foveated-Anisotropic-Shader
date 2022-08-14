@@ -232,6 +232,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mat: {fileID: 2100000, guid: 6d23a3bae8cd9b74ca5987aab927b39a, type: 2}
+  canvas: {fileID: 1653859010}
   btn_addPivot: {fileID: 886748012}
   btn_removePivot: {fileID: 1055915072}
   btn_generateShader: {fileID: 890503248}

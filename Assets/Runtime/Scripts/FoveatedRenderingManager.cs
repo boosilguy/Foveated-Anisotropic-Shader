@@ -22,6 +22,7 @@ namespace foveated.sample
         [SerializeField] Material mat;
 
         [Header("Sample Interface")]
+        [SerializeField] Canvas canvas;
         [SerializeField] Button btn_addPivot;
         [SerializeField] Button btn_removePivot;
         [SerializeField] Button btn_generateShader;
@@ -32,7 +33,12 @@ namespace foveated.sample
 
         public event EventHandler<Vector3> OnClickScreenViewport;
 
+        private List<GameObject> pivotObjectPool = new List<GameObject>();
         private FRMState state = FRMState.Ready;
+        private PointerEventData pointerEventData = new PointerEventData(null);
+        private List<RaycastResult> raycastResults;
+        
+        private GraphicRaycaster GraphicRaycaster => canvas.GetComponent<GraphicRaycaster>();
 
         public FRMState State
         {
@@ -90,9 +96,16 @@ namespace foveated.sample
         {
             if (state == FRMState.Add)
             {
-                if (Input.GetMouseButtonUp(0))
+                pointerEventData.position = Input.mousePosition;
+                raycastResults = new List<RaycastResult>();
+                GraphicRaycaster.Raycast(pointerEventData, raycastResults);
+
+                if (raycastResults.Count < 1)
                 {
-                    OnClickScreenViewport?.Invoke(this, OnPointerClick());
+                    if (Input.GetMouseButtonUp(0))
+                    {
+                        OnClickScreenViewport?.Invoke(this, OnPointerClick());
+                    }
                 }
             }
         }
@@ -101,6 +114,10 @@ namespace foveated.sample
         {
             // Ready State에서 PivotList 초기화
             CameraShader.ClearAnisotropyPivotList();
+
+            // Ready State에서 모든 이벤트 구독취소
+            OnClickScreenViewport -= CameraShader.AddAnisotropyPivot;
+            OnClickScreenViewport -= CameraShader.RemoveAnisotropyPivot;
         }
 
         private void OnAddMode()
@@ -119,7 +136,21 @@ namespace foveated.sample
 
         private void OnGenerateMode()
         {
-            CameraShader.GenerateAnisotropyRender();
+            // Generate State에서 모든 이벤트 구독취소
+            OnClickScreenViewport -= CameraShader.AddAnisotropyPivot;
+            OnClickScreenViewport -= CameraShader.RemoveAnisotropyPivot;
+            
+            var itemCount = CameraShader.AnisotropyPivotList.Count;
+            if (itemCount < 3)
+            {
+                Debug.LogWarning($"<color=#00FF22>[FoveatedRenderingManager]</color> Pivot List의 아이템 개수가 최소 3개 이상 (현재 : {itemCount})이어야 합니다. Pivot을 더 추가하세요.");
+                State = FRMState.Add;
+            }
+            else
+            {
+                CameraShader.GenerateAnisotropyRender();
+            }
+            
         }
 
         private void OnEnd()
@@ -135,6 +166,9 @@ namespace foveated.sample
         public Vector3 OnPointerClick()
         {
             Vector3 point = Camera.main.ScreenToViewportPoint(Input.mousePosition);
+            
+            // Runtime Viewport Coord -> Shader UV Coord
+            point.y = Mathf.Abs(point.y - 1);
             Debug.Log($"<color=#00FF22>[FoveatedRenderingManager]</color> 마우스 버튼이 ({point.x}, {point.y})에서 눌렸습니다.");
             return point;
         }
