@@ -69,6 +69,8 @@ namespace foveated.sample
             // 따라서, Texture의 Pixel 데이터들을 이용해서 동적 데이터를 Shader로 넘길거임.
             // 인자값으로 Texture 데이터와 Pivot Length를 쉐이더로 넘긴 후, Decode하여 사용할 예정.
             int count = anisotropyPivotList.Count;
+            Vector2 median = Vector2.zero;
+
             Texture2D input = new Texture2D(count, 1, TextureFormat.RGBA32, false);
             input.filterMode = FilterMode.Point;
             input.wrapMode = TextureWrapMode.Clamp;
@@ -76,10 +78,16 @@ namespace foveated.sample
             for (int i = 0; i < count; i++)
             {
                 input.SetPixel(i, 0, new Color(anisotropyPivotList[i].x, anisotropyPivotList[i].y, 0.0f, 1.0f));
+                median.x += anisotropyPivotList[i].x;
+                median.y += anisotropyPivotList[i].y;
             }
+
             input.Apply();
+            median /= count;
+
             FoveatedRenderingManager.Instance.Mat.SetTexture("_Container", input);
             FoveatedRenderingManager.Instance.Mat.SetInt("_ContainerLength", count);
+            FoveatedRenderingManager.Instance.Mat.SetVector("_Median", median);
         }
     }
 }

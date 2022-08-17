@@ -2,7 +2,6 @@
 {
 	Properties{
 		[HideInInspector]_MainTex ("Texture", 2D) = "white" {}
-		[HideInInspector]_Container ("Container", 2D) = "white" {}
 		_KernelSize("Kernel Size", Int) = 11
 
 		_inRad("Inner Radius", Float) = 0
@@ -27,6 +26,7 @@
 
 	sampler2D _Container;
 	int _ContainerLength;
+	float2 _Median;
 	
 	uniform float _inRad;
 	uniform float _outRad;
