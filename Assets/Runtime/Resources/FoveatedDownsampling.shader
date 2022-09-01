@@ -24,9 +24,8 @@
 	float2 _MainTex_TexelSize;
 	int _KernelSize;
 
-	sampler2D _Container;
-	int _ContainerLength;
-	float2 _Median;
+	uniform sampler1D _Container;
+	uniform int _ContainerLength;
 	
 	uniform float _inRad;
 	uniform float _outRad;
@@ -77,8 +76,54 @@
 				o.uv = v.uv;
 				return o;
 			}
+			
+			int isLeft(float2 startPivot, float2 endPivot, v2f input)
+			{
+				float calc = ((endPivot.x - startPivot.x) * (input.uv.y - startPivot.y) - (input.uv.x - startPivot.x) * (endPivot.y - startPivot.y));
+				
+				if (calc > 0)
+					return 1;
+				else if (calc < 0)
+					return -1;
+				else
+					return 0;
+			}
 
-			//the fragment shader
+			// Crossing number
+			bool isPointWithin (v2f input, sampler1D container, int containerLength)
+			{
+				int count = 0;
+
+				for (int idx = 0; idx < containerLength; idx++)
+				{
+					float2 currentPivotData = tex1D(container, idx * 1.0 / float(containerLength - 1)).xy;
+					float2 nextPivotData;
+					if (idx + 1 == containerLength) // case : Last idx
+						nextPivotData = tex1D(container, 0 * 1.0 / float(containerLength - 1)).xy;
+					else
+						nextPivotData = tex1D(container, (idx+1) * 1.0 / float(containerLength - 1)).xy;
+					
+					if (currentPivotData.y <= input.uv.y)
+					{
+						if (nextPivotData.y > input.uv.y)
+							if (isLeft(currentPivotData, nextPivotData, input) > 0)
+								++count;
+					}
+					else
+					{
+						if (nextPivotData.y <= input.uv.y)
+							if (isLeft(currentPivotData, nextPivotData, input) < 0)
+								--count;
+					}
+				}
+
+				if (count != 0)
+					return true;
+				else
+					return false;
+			}
+
+			// fragment shader
 			fixed4 frag(v2f i) : SV_TARGET
 			{
 				// Eye-tracking variables & FoV variables
@@ -86,7 +131,6 @@
 				float base_opacity = 1;
 				float X = _eyeXPos;
 				float Y = _eyeYPos;
-				float L = sqrt((i.uv.x - X)*(i.uv.x - X) + (i.uv.y - (1-Y))*(i.uv.y - (1-Y)));
 				float I = _inRad;
 				float O = _outRad;
 				int W = _ResWidth;
@@ -111,13 +155,11 @@
 				temp = pixel_y % K;
 				temp = pixel_y - temp + K/2;
 				o.uv.y = (float)temp / H;
-
-				if (L < I)
+				
+				if (isPointWithin(i, _Container, _ContainerLength))
 					return tex2D(_MainTex, i.uv);
 				else
 					return tex2D(_MainTex, o.uv);
-
-				return tex2D(_MainTex, o.uv);
 			}
 			ENDCG
 		}

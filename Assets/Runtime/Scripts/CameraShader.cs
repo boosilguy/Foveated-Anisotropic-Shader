@@ -32,17 +32,16 @@ namespace foveated.sample
             }
         }
 
-        public void AddAnisotropyPivot(object sender, Vector3 target)
+        public void AddAnisotropyPivot(object sender, Vector2 target)
         {
-            anisotropyPivotList.Add(new Vector4(target.x, target.y));
+            anisotropyPivotList.Add(target);
         }
 
-        public void RemoveAnisotropyPivot(object sender, Vector3 target)
+        public void RemoveAnisotropyPivot(object sender, Vector2 target)
         {
             if (anisotropyPivotList.Count != 0)
             {
-                Vector2 target_v2 = new Vector2(target.x, target.y);
-                Vector2 nearest = anisotropyPivotList.OrderBy(p => Vector2.Distance(p, target_v2)).FirstOrDefault();
+                Vector2 nearest = anisotropyPivotList.OrderBy(p => Vector2.Distance(p, target)).FirstOrDefault();
                 anisotropyPivotList.Remove(nearest);
             }
             else
@@ -69,8 +68,7 @@ namespace foveated.sample
             // 따라서, Texture의 Pixel 데이터들을 이용해서 동적 데이터를 Shader로 넘길거임.
             // 인자값으로 Texture 데이터와 Pivot Length를 쉐이더로 넘긴 후, Decode하여 사용할 예정.
             int count = anisotropyPivotList.Count;
-            Vector2 median = Vector2.zero;
-
+            
             Texture2D input = new Texture2D(count, 1, TextureFormat.RGBA32, false);
             input.filterMode = FilterMode.Point;
             input.wrapMode = TextureWrapMode.Clamp;
@@ -78,16 +76,49 @@ namespace foveated.sample
             for (int i = 0; i < count; i++)
             {
                 input.SetPixel(i, 0, new Color(anisotropyPivotList[i].x, anisotropyPivotList[i].y, 0.0f, 1.0f));
-                median.x += anisotropyPivotList[i].x;
-                median.y += anisotropyPivotList[i].y;
             }
 
             input.Apply();
-            median /= count;
-
             FoveatedRenderingManager.Instance.Mat.SetTexture("_Container", input);
             FoveatedRenderingManager.Instance.Mat.SetInt("_ContainerLength", count);
-            FoveatedRenderingManager.Instance.Mat.SetVector("_Median", median);
+        }
+
+        public void ResetAnisotropyRender()
+        {
+            int count = 0;
+
+            Texture2D input = new Texture2D(count, 1, TextureFormat.RGBA32, false);
+            input.filterMode = FilterMode.Point;
+            input.wrapMode = TextureWrapMode.Clamp;
+            input.Apply();
+            FoveatedRenderingManager.Instance.Mat.SetTexture("_Container", input);
+            FoveatedRenderingManager.Instance.Mat.SetInt("_ContainerLength", count);
+        }
+
+        public string GetAnisotropyPivotListInfo(bool lineBreak = false)
+        {
+            string result = string.Empty;
+
+            if (anisotropyPivotList.Count != 0)
+            {
+                if (lineBreak)
+                    result += "\n";
+
+                for (int idx = 0; idx < anisotropyPivotList.Count; idx++)
+                {
+                    result += $"[{idx+1}] {anisotropyPivotList[idx].ToString()}";
+
+                    if (idx != anisotropyPivotList.Count - 1)
+                    {
+                        if (lineBreak)
+                            result += "\n";
+                        else
+                            result += " -> ";
+                    } 
+                }
+                return result;
+            }
+            return "Empty";
         }
     }
 }
