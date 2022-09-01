@@ -1,5 +1,5 @@
 # Foveated-Anisotropic-Shader
-Anisotropic Foveated Rendering Shader
+Anisotropic Foveated Rendering Shader (Unity 2020.3.20)
 
 ## 구성
 
