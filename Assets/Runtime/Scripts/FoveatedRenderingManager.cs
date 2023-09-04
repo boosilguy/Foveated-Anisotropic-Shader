@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
 using System;
@@ -30,7 +30,7 @@ namespace foveated.sample
         [SerializeField] Button btn_reset;
 
         [Header("Pivot Prefab")]
-        [SerializeField] GameObject pivot;
+        [SerializeField] PivotOnClickManager pivot;
 
         [HideInInspector] public Material Mat => mat;
         [HideInInspector] public CameraShader CameraShader => Camera.main.GetComponent<CameraShader>();
@@ -40,7 +40,7 @@ namespace foveated.sample
         private FRMState state = FRMState.Ready;
         private PointerEventData pointerEventData = new PointerEventData(null);
         private List<RaycastResult> raycastResults;
-        private Dictionary<Vector2, GameObject> pivotPool = new Dictionary<Vector2, GameObject>();
+        private List<GameObject> pivotPool = new List<GameObject>();
 
         private GraphicRaycaster GraphicRaycaster => canvas.GetComponent<GraphicRaycaster>();
 
@@ -113,20 +113,6 @@ namespace foveated.sample
                     }
                 }
             }
-            else if (state == FRMState.Remove)
-            {
-                pointerEventData.position = Input.mousePosition;
-                raycastResults = new List<RaycastResult>();
-                GraphicRaycaster.Raycast(pointerEventData, raycastResults);
-
-                if (raycastResults.Count < 1)
-                {
-                    if (Input.GetMouseButtonUp(0))
-                    {
-                        OnClickScreenViewport?.Invoke(this, OnPointerClick(false));
-                    }
-                }
-            }
         }
 
         private void OnReady()
@@ -140,7 +126,7 @@ namespace foveated.sample
             // Ready State에서 Pivot GameObject 초기화
             if (pivotPool.Count != 0)
             {
-                foreach (var item in pivotPool.Values)
+                foreach (var item in pivotPool)
                     Destroy(item);
                 pivotPool.Clear();
             }
@@ -193,24 +179,22 @@ namespace foveated.sample
             Debug.Log($"<color=#00FF22>[FoveatedRenderingManager]</color> StateChange {this.state} => {state}");
         }
 
-        public Vector2 OnPointerClick(bool addMode = true)
+        public Vector2 OnPointerClick()
         {
             var input = Input.mousePosition;
             Vector2 point = Camera.main.ScreenToViewportPoint(input);
-            
-            if (addMode)
-            {
-                pivotPool.Add(point, Instantiate(pivot, input, Quaternion.identity, canvas.transform));
-                Debug.Log($"<color=#00FF22>[FoveatedRenderingManager]</color> 마우스 버튼이 ({point.x}, {point.y})에서 눌렸습니다.");
-            }
-            else
-            {
-                Vector2 nearest = pivotPool.Keys.OrderBy(p => Vector2.Distance(p, point)).FirstOrDefault();
-                Debug.Log($"<color=#00FF22>[FoveatedRenderingManager]</color> 마우스 버튼이 ({point.x}, {point.y})에서 눌렸습니다.");
-                Destroy(pivotPool[nearest]);
-                pivotPool.Remove(nearest);
-            }
+            GameObject generatedPivotObject = Instantiate(pivot.gameObject, input, Quaternion.identity, canvas.transform);
+            pivotPool.Add(generatedPivotObject);
+            Debug.Log($"<color=#00FF22>[FoveatedRenderingManager]</color> Pivot을 추가하였습니다.");
             return point;
+        }
+
+        public bool RemovePivotInPool(PivotOnClickManager target)
+        {
+            bool result = pivotPool.Remove(target.gameObject);
+            if(result)
+                Debug.Log($"<color=#00FF22>[FoveatedRenderingManager]</color> Pivot을 제거하였습니다.");
+            return result;
         }
     }
 }

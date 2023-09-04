@@ -1,6 +1,8 @@
 # Foveated-Anisotropic-Shader
 Anisotropic Foveated Rendering Shader (Unity 2020.3.20)
 
+연구실 후배를 위한 프로젝트
+
 ## 구성
 
 ### Debug Window
@@ -13,8 +15,7 @@ Anisotropic Foveated Rendering Shader (Unity 2020.3.20)
 
 ### Remove Pivot Button
 
-Pivot을 삭제할 수 있는 모드. 해당 마우스 클릭 지점에서 가장 가까운 Pivot을 삭제함. 
-- ***(주의)*** Pivot GameObject는 UI GameObject로 구성되어 있으므로 GameObject를 클릭하지 말고, 인근 위치를 클릭해야 삭제됨.
+Pivot을 삭제할 수 있는 모드. 마우스 클릭 시, 해당 위치의 Pivot을 삭제함.
 
 ### Generate Button
 

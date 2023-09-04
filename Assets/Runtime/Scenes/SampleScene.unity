@@ -237,7 +237,7 @@ MonoBehaviour:
   btn_removePivot: {fileID: 1055915072}
   btn_generateShader: {fileID: 890503248}
   btn_reset: {fileID: 2103327897}
-  pivot: {fileID: 1184301827183948495, guid: 63949b472a398704db46716a776a237c, type: 3}
+  pivot: {fileID: 9117227030962034190, guid: 63949b472a398704db46716a776a237c, type: 3}
 --- !u!4 &203670699
 Transform:
   m_ObjectHideFlags: 0
@@ -250,7 +250,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &338399050
 GameObject:
@@ -1844,7 +1844,7 @@ RectTransform:
   - {fileID: 729416997}
   - {fileID: 1320551286}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
