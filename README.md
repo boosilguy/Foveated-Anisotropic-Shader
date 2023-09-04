@@ -32,3 +32,5 @@ Pivot을 모두 지우고 초기 상태로 돌아감.
 3. 필요하다면 Remove Pivot Button을 눌러, 삭제 상태로 진입합니다. 후에, Pivot GameObject 근방을 눌러, Pivot을 제거합니다.
 4. Generate Button을 눌러, 구현된 비등방성 필터링을 확인할 수 있습니다.
 5. 초기 화면으로 진입하기 위해, Reset Button을 누릅니다.
+
+![image](./Assets/foveatedanisotropicshader00.gif)

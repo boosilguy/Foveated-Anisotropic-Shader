@@ -133,28 +133,24 @@ namespace foveated.sample
 
             // Ready State에서 모든 이벤트 구독취소
             OnClickScreenViewport -= CameraShader.AddAnisotropyPivot;
-            OnClickScreenViewport -= CameraShader.RemoveAnisotropyPivot;
         }
 
         private void OnAddMode()
         {
             // Add State에서 Pivot 추가 이벤트 구독 및 삭제 이벤트 구독 취소
             OnClickScreenViewport += CameraShader.AddAnisotropyPivot;
-            OnClickScreenViewport -= CameraShader.RemoveAnisotropyPivot;
         }
 
         private void OnRemoveMode()
         {
             // Add State에서 Pivot 추가 이벤트 구독취소 및 삭제 이벤트 구독
             OnClickScreenViewport -= CameraShader.AddAnisotropyPivot;
-            OnClickScreenViewport += CameraShader.RemoveAnisotropyPivot;
         }
 
         private void OnGenerateMode()
         {
             // Generate State에서 모든 이벤트 구독취소
             OnClickScreenViewport -= CameraShader.AddAnisotropyPivot;
-            OnClickScreenViewport -= CameraShader.RemoveAnisotropyPivot;
             
             var itemCount = CameraShader.AnisotropyPivotList.Count;
             if (itemCount < 3)
@@ -184,6 +180,7 @@ namespace foveated.sample
             var input = Input.mousePosition;
             Vector2 point = Camera.main.ScreenToViewportPoint(input);
             GameObject generatedPivotObject = Instantiate(pivot.gameObject, input, Quaternion.identity, canvas.transform);
+            generatedPivotObject.GetComponent<PivotOnClickManager>().PivotPosition = point;
             pivotPool.Add(generatedPivotObject);
             Debug.Log($"<color=#00FF22>[FoveatedRenderingManager]</color> Pivot을 추가하였습니다.");
             return point;
