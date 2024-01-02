@@ -2,9 +2,7 @@
 
 ![title](./main.png)
 
-Anisotropic Foveated Rendering Shader (Unity 2020.3.20)
-
-연구실 후배를 위한 프로젝트
+연구실 후배를 위한 프로젝트 (https://github.com/boosilguy/Foveated-Anisotropic-Shader)
 
 ## 구성
 
